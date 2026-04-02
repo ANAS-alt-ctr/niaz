@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 
-API_URL = "http://127.0.0.1:8001"
+API_URL = "http://127.0.0.1:8000"
 
 st.set_page_config(page_title="Fraud System", layout="wide")
 
@@ -28,9 +28,12 @@ def normalize(val):
 
 
 def load_data():
-    res = requests.get(f"{API_URL}/fraud")
-    if res.status_code == 200:
-        return pd.DataFrame(res.json())
+    try:
+        res = requests.get(f"{API_URL}/fraud")
+        if res.status_code == 200:
+            return pd.DataFrame(res.json())
+    except requests.exceptions.RequestException as e:
+        print(f"API Connection Error: {e}")
     return pd.DataFrame()
 
 
@@ -139,28 +142,31 @@ elif menu == "Add Progress":
             "feedback": feedback
         }
 
-        res = requests.post(f"{API_URL}/add_update", json=payload)
+        try:
+            res = requests.post(f"{API_URL}/add_update", json=payload)
 
-        if res.status_code == 200:
-            data = res.json()
+            if res.status_code == 200:
+                data = res.json()
 
-            st.success("Progress Submitted Successfully")
+                st.success("Progress Submitted Successfully")
 
-            score = float(data.get("max_score", 0))
-            percent = round(score * 100, 2)
+                score = float(data.get("max_score", 0))
+                percent = round(score * 100, 2)
 
-            if percent >= 75:
-                st.error(f"Fraud Detected: {percent}%")
-            elif percent >= 50:
-                st.warning(f"Risk Detected: {percent}%")
+                if percent >= 75:
+                    st.error(f"Fraud Detected: {percent}%")
+                elif percent >= 50:
+                    st.warning(f"Risk Detected: {percent}%")
+                else:
+                    st.success(f"Safe: {percent}%")
+
+                st.write("Matched Work:", data.get("matched"))
+                st.write("Matched Date:", data.get("matched_date"))
+
             else:
-                st.success(f"Safe: {percent}%")
-
-            st.write("Matched Work:", data.get("matched"))
-            st.write("Matched Date:", data.get("matched_date"))
-
-        else:
-            st.error("API Error")
+                st.error("API Error")
+        except requests.exceptions.RequestException as e:
+            st.error(f"Cannot connect to the backend server: {e}")
 
 
 # =========================
