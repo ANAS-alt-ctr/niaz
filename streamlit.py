@@ -2,18 +2,6 @@ import streamlit as st
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
-import subprocess
-import socket
-import time
-import sys
-
-def is_port_in_use(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(('127.0.0.1', port)) == 0
-
-if not is_port_in_use(8000):
-    subprocess.Popen([sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8000"])
-    time.sleep(3) # Wait for backend to boot
 
 API_URL = "http://127.0.0.1:8000"
 
