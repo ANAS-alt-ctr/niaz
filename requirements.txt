@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+scikit-learn
+motor
+python-dotenv
+pydantic
+streamlit
+requests
+pandas
+matplotlib
